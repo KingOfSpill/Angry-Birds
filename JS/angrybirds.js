@@ -15,87 +15,12 @@ var box;
 var Vspeed = 1;
 var Hspeed = 1;
 
-function PivotCamera( inRadius, inCamera, parent ){
-
-	this.radius = inRadius;
-	this.horizontalAngle = 45;
-	this.verticalAngle = 45;
-
-	this.rotSpeed = 0.02;
-
-	this.camera = inCamera;
-
-	parent.add( this.camera );
-
-	this.camera.position.x = this.radius/Math.sqrt(2);
-	this.camera.position.y = this.radius/Math.sqrt(2);
-	this.camera.position.z = this.radius/Math.sqrt(2);
-
-	this.updateCamera = function(){
-
-		if( Key.isDown(Key.UPARROW) ){
-
-			this.camera.position.y += 1;
-			
-			if( this.camera.position.y < 10 )
-				this.radius -= this.rotSpeed;
-			else if( this.camera.position.y > 10 )
-				this.radius += this.rotSpeed;
-
-			this.camera.position.x = this.radius * Math.cos(this.horizontalAngle);
-			this.camera.position.z = this.radius * Math.sin(this.horizontalAngle);
-
-			this.camera.lookAt(scene.position);
-
-		}else if( Key.isDown(Key.DOWNARROW) ){
-
-			this.camera.position.y -= 1;
-
-			if( this.camera.position.y > 10 )
-				this.radius -= this.rotSpeed;
-			else if( this.camera.position.y < 10 )
-				this.radius += this.rotSpeed;
-
-			this.camera.position.x = this.radius * Math.cos(this.horizontalAngle);
-			this.camera.position.z = this.radius * Math.sin(this.horizontalAngle);
-
-			this.camera.lookAt(scene.position);
-
-		}
-
-		if( Key.isDown(Key.LEFTARROW) ){
-
-			this.horizontalAngle += this.rotSpeed;
-			this.horizontalAngle = this.horizontalAngle % 360;
-
-			this.camera.position.x = this.radius * Math.cos(this.horizontalAngle);
-			this.camera.position.z = this.radius * Math.sin(this.horizontalAngle);
-
-			this.camera.lookAt(scene.position);
-
-		}else if( Key.isDown(Key.RIGHTARROW) ){
-
-			this.horizontalAngle -= this.rotSpeed;
-			this.horizontalAngle = this.horizontalAngle % 360;
-
-			this.camera.position.x = this.radius * Math.cos(this.horizontalAngle);
-			this.camera.position.z = this.radius * Math.sin(this.horizontalAngle);
-
-			this.camera.lookAt(scene.position);
-
-		}
-
-
-	}
-
-}
-
 function init(){
 
 	initScene();
 	initLights();
-	initRenderer();
 	initCamera();
+	initRenderer();
 
 	requestAnimationFrame( render );
 
@@ -145,27 +70,35 @@ function initRenderer(){
 
 	renderer = new THREE.WebGLRenderer();
 	renderer.setClearColor( 0xAAAAFF, 1.0 );
-
-	if( window.innerWidth > window.innerHeight )
-		renderer.setSize( window.innerHeight*aspectRatio*.9, window.innerHeight*.9 );
-	else
-		renderer.setSize( window.innerWidth*.9, window.innerWidth*(1/aspectRatio)*.9 );
-
 	
 	renderer.shadowMapEnabled = true;
+
+	resize();
 
 	document.body.appendChild( renderer.domElement );
 
 }
 
+function resize() {
+	const w = document.body.clientWidth - 5;
+	const h = window.innerHeight - 5;
+    renderer.setSize(w, h);
+    camera.camera.aspect = w / h;
+    camera.camera.updateProjectionMatrix();
+}; 
+
+window.addEventListener("resize", resize);
+
 function initCamera(){
 
-	camera = new PivotCamera( 145, new THREE.PerspectiveCamera( 45, aspectRatio, 0.1, 10000 ), box );
+	camera = new BIRD.BirdCamera( 400, new THREE.PerspectiveCamera( 45, aspectRatio, 0.1, 10000 ), box );
 	camera.camera.lookAt( scene.position );
 
 }
 
 function render(){
+
+	box.setAngularVelocity( new THREE.Vector3( 0, 0, 0 ) );
 
 	scene.simulate();
 
@@ -176,8 +109,6 @@ function render(){
 		box.setLinearVelocity( box.getLinearVelocity().add( new THREE.Vector3(0,0,Hspeed) ) );
 	else if( Key.isDown(Key.D) )
 		box.setLinearVelocity( box.getLinearVelocity().add( new THREE.Vector3(0,0,-Hspeed) ) );
-
-	box.setAngularVelocity( new THREE.Vector3( 0, 0, 0 ) );
 
 	camera.updateCamera();
 
