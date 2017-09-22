@@ -15,6 +15,9 @@ var box;
 var Vspeed = 1;
 var Hspeed = 1;
 
+var mouseDownPos;
+var speed = 1;
+
 function init(){
 
 	initScene();
@@ -88,6 +91,37 @@ function resize() {
 }; 
 
 window.addEventListener("resize", resize);
+window.addEventListener("mousedown", function(e){ handleMouseDown(e); } );
+
+function handleMouseDown(event){
+
+	mouseDownPos = new THREE.Vector2( event.clientX, event.clientY );
+
+	window.addEventListener("mousemove", function(e){ handleMouseMovement(e); });
+	window.addEventListener("mouseup", function(e){ handleMouseUp(e); });
+
+}
+
+function handleMouseMovement( event ){
+
+	//Make a box draw from the box out the same direction as the mouse pos
+
+}
+
+function handleMouseUp( event ){
+
+	box.setLinearVelocity(
+		new THREE.Vector3(
+			0,
+			speed * (event.clientY - mouseDownPos.y),
+			speed * (event.clientX - mouseDownPos.x)
+		)
+	);
+
+	window.removeEventListener("mousemove", handleMouseMovement);
+	window.removeEventListener("mouseup", handleMouseUp);
+
+}
 
 function initCamera(){
 
@@ -101,14 +135,6 @@ function render(){
 	box.setAngularVelocity( new THREE.Vector3( 0, 0, 0 ) );
 
 	scene.simulate();
-
-	if( Key.isDown(Key.W) )
-		box.setLinearVelocity( box.getLinearVelocity().add( new THREE.Vector3(0,Vspeed,0) ) );
-
-	if( Key.isDown(Key.A) )
-		box.setLinearVelocity( box.getLinearVelocity().add( new THREE.Vector3(0,0,Hspeed) ) );
-	else if( Key.isDown(Key.D) )
-		box.setLinearVelocity( box.getLinearVelocity().add( new THREE.Vector3(0,0,-Hspeed) ) );
 
 	camera.updateCamera();
 

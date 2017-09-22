@@ -28,8 +28,12 @@ BIRD.BirdCamera = function ( inRadius, inCamera, parent ){
 		this.horizontalAngle = -this.parent.getLinearVelocity().z/360;
 		this.horizontalAngle = this.horizontalAngle % 360;
 
-		this.camera.position.x = this.radius * Math.cos(this.horizontalAngle);
-		this.camera.position.z = this.radius * Math.sin(this.horizontalAngle);
+		this.camera.position.x *= 3;
+		this.camera.position.x += this.radius * Math.cos(this.horizontalAngle);
+		this.camera.position.x /= 4;
+		this.camera.position.z *= 3;
+		this.camera.position.z += this.radius * Math.sin(this.horizontalAngle);
+		this.camera.position.z /= 4;
 
 		this.camera.lookAt(new THREE.Vector3(0,0,0));
 
