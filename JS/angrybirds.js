@@ -11,12 +11,12 @@ var camera;
 var aspectRatio = 1.75;
 var sun;
 var baseLight
-var box;
+var bird;
 var Vspeed = 1;
 var Hspeed = 1;
 
 var mouseDownPos;
-var speed = 1;
+var speed = 10;
 
 function init(){
 
@@ -32,37 +32,48 @@ function init(){
 function initScene(){
 
 	scene = new Physijs.Scene;
+	scene.setGravity( new THREE.Vector3(0,-100,0) );
 
-	var ground = new Physijs.BoxMesh( 
-			new THREE.BoxGeometry(1500,2,1500),
-			new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture('Textures/Grass.png') }),
-			0
-		);
-	ground.position.y = -10;
-	ground.castShadow = true;
-	scene.add(ground);
+	var groundMaterial = Physijs.createMaterial(
+	    new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture('Textures/Grass.png') }),
+	    0.8,
+	    0.8
+	);
 
-	box = new Physijs.BoxMesh(
-			new THREE.BoxGeometry( 15, 15, 15 ),
-			new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture('Textures/test.jpg') }),
-			5
-		);
-	box.position.y = 20;
-	box.castShadow = true;
-	scene.add( box );
+	var floor = new Physijs.BoxMesh( new THREE.BoxGeometry(2000,4000,15000), groundMaterial, 0 );
+	floor.position.x = -600;
+	floor.position.y = -2000;
+	floor.receiveShadow = true;
+	scene.add(floor);
+
+	var leftSide = new Physijs.BoxMesh( new THREE.BoxGeometry(2000,4000,4000), groundMaterial, 0 );
+	leftSide.position.z = 10000;
+	leftSide.position.x = -600;
+	leftSide.rotation.x = -Math.PI / 4;
+	leftSide.receiveShadow = true;
+	scene.add(leftSide);
+
+	var rightSide = new Physijs.BoxMesh( new THREE.BoxGeometry(2000,4000,4000), groundMaterial, 0 );
+	rightSide.position.z = -10000;
+	rightSide.position.x = -600;
+	rightSide.rotation.x = Math.PI / 4;
+	rightSide.receiveShadow = true;
+	scene.add(rightSide);
+
+	bird = new BIRD.createBird( 0xFF0000, scene, 0, 20, 6000 );
 
 }
 
 function initLights(){
 
-	baseLight = new THREE.AmbientLight();
-	baseLight.intensity = 0.0005;
+	baseLight = new THREE.AmbientLight(0x555555);
+	baseLight.intensity = 1;
 	scene.add(baseLight);
 
 	sun = new THREE.DirectionalLight(0xFFFFFF);
-	sun.position = new THREE.Vector3( 1, 1, 1 );
-	sun.intensity = 0.2;
-	sun.shadowCameraNear = 1;
+	sun.position = new THREE.Vector3( 1, 1, 0 );
+	sun.intensity = 1;
+	sun.shadowCameraNear = 0.1;
 	sun.shadowCameraFar = 1000;
 	sun.castShadow = true;
 	scene.add(sun);
@@ -104,13 +115,13 @@ function handleMouseDown(event){
 
 function handleMouseMovement( event ){
 
-	//Make a box draw from the box out the same direction as the mouse pos
+	//Make a bird.mesh draw from the bird.mesh out the same direction as the mouse pos
 
 }
 
 function handleMouseUp( event ){
 
-	box.setLinearVelocity(
+	bird.mesh.setLinearVelocity(
 		new THREE.Vector3(
 			0,
 			speed * (event.clientY - mouseDownPos.y),
@@ -125,14 +136,14 @@ function handleMouseUp( event ){
 
 function initCamera(){
 
-	camera = new BIRD.BirdCamera( 400, new THREE.PerspectiveCamera( 45, aspectRatio, 0.1, 10000 ), box );
+	camera = new BIRD.BirdCamera( 2000, new THREE.PerspectiveCamera( 45, aspectRatio, 0.1, 10000 ), bird.mesh );
 	camera.camera.lookAt( scene.position );
 
 }
 
 function render(){
 
-	box.setAngularVelocity( new THREE.Vector3( 0, 0, 0 ) );
+	//bird.mesh.setAngularVelocity( new THREE.Vector3( 0, 0, 0 ) );
 
 	scene.simulate();
 
