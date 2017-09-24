@@ -3,7 +3,7 @@ var BIRD = { REVISION: '2' };
 BIRD.createBird = function ( color, scene, position){
 
 	const birdMaterial = Physijs.createMaterial(
-	    new THREE.MeshLambertMaterial({ color: color, map: THREE.ImageUtils.loadTexture('Textures/test.jpg') }),
+	    new THREE.MeshLambertMaterial({ color: color, map: THREE.ImageUtils.loadTexture('Textures/birb.png') }),
 	    1,
 	    0.1
 	);
@@ -34,7 +34,7 @@ BIRD.createBird = function ( color, scene, position){
 	}
 
 	this.mesh = new Physijs.SphereMesh(
-		new THREE.SphereGeometry( 15 ),
+		new THREE.SphereGeometry( 35 ),
 		birdMaterial,
 		200
 	);
@@ -87,8 +87,8 @@ BIRD.BirdCamera = function ( inRadius, inCamera, parent ){
 			this.radius = (this.parent.position.y) * 2 * Math.sqrt(2);
 		}else if( this.parent.name != "slingshot" ){
 			this.radius = this.minRadius;
-		}else if( Math.abs(this.parent.position.z*2) * Math.sqrt(2) > this.minRadius ){
-			this.radius = Math.abs(this.parent.position.z) * Math.sqrt(2);
+		}else if( (this.parent.position.z) * 2 * Math.sqrt(2)/this.camera.aspect > this.minRadius ){
+			this.radius = (this.parent.position.z) * 2 * Math.sqrt(2)/this.camera.aspect;
 		}
 
 		if( this.parent.name != "slingshot" )

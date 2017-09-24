@@ -190,7 +190,7 @@ function generateStairStep(numSteps, z, lastY){
 	var top = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,20,220), new THREE.Vector3(0,lastY+200,z), scene );
 
 	if( Math.random() < 0.5 )
-		var falling = new TARGET.createFallingTarget(0x44FF00, 35, new THREE.Vector3(0,lastY+245,z), scene );
+		var falling = new TARGET.createFallingTarget(0xFFFF00, 35, new THREE.Vector3(0,lastY+245,z), scene );
 
 	if( numSteps > 1 )
 		generateStairStep( numSteps - 1, z - 200, lastY + 220 );
@@ -204,7 +204,7 @@ function generateStepStair(numSteps, z, lastY){
 	var top = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,20,220), new THREE.Vector3(0,lastY+200,z), scene );
 
 	if( Math.random() < 0.5 )
-		var falling = new TARGET.createFallingTarget(0x44FF00, 35, new THREE.Vector3(0,lastY+245,z), scene );
+		var falling = new TARGET.createFallingTarget(0xFFFF00, 35, new THREE.Vector3(0,lastY+245,z), scene );
 
 	if( numSteps > 1 )
 		generateStepStair( numSteps - 1, z + 200, lastY + 220 );
