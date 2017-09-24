@@ -40,11 +40,20 @@ function initScene(){
 	    0.8
 	);
 
+	var destroyFallingObject = function(other_object, relative_velocity, relative_rotation, contact_normal){
+
+		if( other_object.name == "Falling" ){
+			remove(other_object);
+		}
+
+	}
+
 	var floor = new Physijs.BoxMesh( new THREE.BoxGeometry(2000,4000,15000), groundMaterial, 0 );
 	floor.position.x = -600;
 	floor.position.y = -2000;
 	floor.receiveShadow = true;
 	floor.name = "ground";
+	floor.addEventListener( 'collision', destroyFallingObject);
 	scene.add(floor);
 
 	var leftSide = new Physijs.BoxMesh( new THREE.BoxGeometry(2000,4000,4000), groundMaterial, 0 );
@@ -53,6 +62,7 @@ function initScene(){
 	leftSide.rotation.x = -Math.PI / 4;
 	leftSide.receiveShadow = true;
 	leftSide.name = "ground";
+	leftSide.addEventListener( 'collision', destroyFallingObject);
 	scene.add(leftSide);
 
 	var rightSide = new Physijs.BoxMesh( new THREE.BoxGeometry(2000,4000,4000), groundMaterial, 0 );
@@ -61,18 +71,28 @@ function initScene(){
 	rightSide.rotation.x = Math.PI / 4;
 	rightSide.receiveShadow = true;
 	rightSide.name = "ground";
+	rightSide.addEventListener( 'collision', destroyFallingObject);
 	scene.add(rightSide);
 
-	bird = new BIRD.createBird( 0xFF0000, scene, 0, 20, 6000 );
-	bird.mesh.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+	var destroyDestructibleObject = function( other_object, relative_velocity, relative_rotation, contact_normal ) {
     	
-		if( other_object.name != "ground" ){
+		if( other_object.name == "Destructible" ){
 			remove(other_object);
 		}
 
-	});
+	}
 
-	var target = new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(50,100,20), new THREE.Vector3(0,20,5600), scene );
+	bird = new BIRD.createBird( 0xFF0000, scene, 0, 20, 6000 );
+	bird.mesh.addEventListener( 'collision', destroyDestructibleObject);
+
+	var target =  new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(100,200,20), new THREE.Vector3(0,100,5600), scene );
+	var target2 = new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(100,200,20), new THREE.Vector3(0,100,5400), scene );
+	var target3 = new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(100,20,220), new THREE.Vector3(0,210,5500), scene );
+	var target4 = new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(100,200,20), new THREE.Vector3(0,320,5400), scene );
+	var target5 = new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(100,420,20), new THREE.Vector3(0,210,5200), scene );
+	var target6 = new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(100,20,220), new THREE.Vector3(0,420,5300), scene );
+	var falling = new TARGET.createFallingTarget(0xFFFF00, 0, 35, new THREE.Vector3(0,280,5500), scene );
+	var falling2 = new TARGET.createFallingTarget(0xFFFF00, 0, 35, new THREE.Vector3(0,490,5300), scene );
 
 }
 

@@ -19,7 +19,7 @@ TARGET.createDestructibleTarget = function( destructionVelocity, color, score, s
 		targetMaterial,
 		200
 	);
-	this.mesh.name = numTargets.toString();
+	this.mesh.name = "Destructible";
 	this.mesh.position = position;
 
 	scene.add( this.mesh );
@@ -36,15 +36,14 @@ TARGET.createFallingTarget = function( color, score, size, position, scene ){
 	    0.0
 	);
 
-	this.destructionVelocity = destructionVelocity;
 	this.score = score;
 
-	this.mesh = new Physijs.BoxMesh(
-		new THREE.BoxGeometry( size.x, size.y, size.z ),
+	this.mesh = new Physijs.SphereMesh(
+		new THREE.SphereGeometry( size ),
 		targetMaterial,
 		200
 	);
-	this.mesh.name = numTargets.toString();
+	this.mesh.name = "Falling";
 	this.mesh.position = position;
 
 	scene.add( this.mesh );
