@@ -8,21 +8,43 @@ window.onload = init;
 var renderer;
 var scene;
 var camera;
-var aspectRatio = 1.75;
 var slingshot
 var sun;
 var baseLight
 var bird;
 
+var hudRenderer;
+var hudCamera;
+
+var ambientNoise;
+var music;
+
 var mouseDownPos;
-var speed = 10;
+var speed = 1000;
+
+var score = 0;
+var scoreText;
+
+// This disables the slingshot until the scene has loaded
+var simulationStarted = function() {
+
+	scene.removeEventListener( 'update', simulationStarted);
+	window.addEventListener("mousedown", function(e){ handleMouseDown(e); } );
+    	
+}
 
 function init(){
 
 	initScene();
+
+	scene.addEventListener( 'update', simulationStarted);
+
+	initHud();
+
 	initLights();
 	initCamera();
 	initRenderer();
+	initAudio();
 
 	requestAnimationFrame( render );
 
@@ -35,13 +57,14 @@ function initScene(){
 
 	var groundMaterial = Physijs.createMaterial(
 	    new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture('Textures/Grass.png') }),
-	    0.8,
-	    0.8
+	    1,
+	    0.0
 	);
 
 	var destroyFallingObject = function(other_object, relative_velocity, relative_rotation, contact_normal){
 
 		if( other_object.name == "Falling" ){
+			updateScore(100);
 			remove(other_object);
 		}
 
@@ -73,17 +96,6 @@ function initScene(){
 	rightSide.addEventListener( 'collision', destroyFallingObject);
 	scene.add(rightSide);
 
-	var destroyDestructibleObject = function( other_object, relative_velocity, relative_rotation, contact_normal ) {
-    	
-		if( other_object.name == "Destructible" ){
-			remove(other_object);
-		}
-
-	}
-
-	bird = new BIRD.createBird( 0xFF0000, scene, 0, 20, 6000 );
-	bird.mesh.addEventListener( 'collision', destroyDestructibleObject);
-
 	var target =  new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(100,200,20), new THREE.Vector3(0,100,5600), scene );
 	var target2 = new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(100,200,20), new THREE.Vector3(0,100,5400), scene );
 	var target3 = new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(100,20,220), new THREE.Vector3(0,210,5500), scene );
@@ -94,6 +106,49 @@ function initScene(){
 	var falling2 = new TARGET.createFallingTarget(0xFFFF00, 0, 35, new THREE.Vector3(0,490,5300), scene );
 
 	slingshot = new SLINGSHOT.createSlingshot(scene, new THREE.Vector3(0,100,6100));
+
+}
+
+function initHud(){
+
+	scoreText = document.createElement('div');
+	scoreText.style.position = 'absolute';
+	scoreText.style.width = 20 + '%';
+	scoreText.style.height = 20 + '%';
+	scoreText.style.color = "white";
+	scoreText.style.fontSize = 3 + 'vw';
+	scoreText.style.top = 5 + '%';
+	scoreText.style.left = 5 + '%';
+	updateScore(0);
+	document.body.appendChild(scoreText);
+
+}
+
+function updateScore(amount){
+
+	score += amount;
+	scoreText.innerHTML = "Score: " + score;
+
+}
+
+var destroyDestructibleObject = function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+
+	if( other_object.name == "Destructible" ){
+		if( bird.destroyedObject() ){
+			deleteBird();
+		}
+		updateScore(50);
+		remove(other_object);
+	}
+
+}
+
+function deleteBird(){
+
+	scene.remove(bird.mesh);
+	bird.mesh.removeEventListener('collision', destroyDestructibleObject);
+	bird = null;
+	camera.setParent( slingshot.handleMesh );
 
 }
 
@@ -133,19 +188,20 @@ function initRenderer(){
 }
 
 function resize() {
-	const w = document.body.clientWidth - 5;
-	const h = window.innerHeight - 5;
+	const w = document.body.clientWidth;
+	const h = document.body.clientHeight;
     renderer.setSize(w, h);
     camera.camera.aspect = w / h;
     camera.camera.updateProjectionMatrix();
 }; 
 
 window.addEventListener("resize", resize);
-window.addEventListener("mousedown", function(e){ handleMouseDown(e); } );
 
 function handleMouseDown(event){
 
 	mouseDownPos = new THREE.Vector2( event.clientX, event.clientY );
+	slingshot.stretch.play();
+
 
 	window.addEventListener("mousemove", handleMouseMovement);
 	window.addEventListener("mouseup", handleMouseUp);
@@ -160,13 +216,24 @@ var handleMouseMovement = function( e ){
 
 var handleMouseUp = function( e ){
 
-	/*bird.mesh.setLinearVelocity(
+	bird = new BIRD.createBird( 0xFF0000, scene, new THREE.Vector3(0,400,6100) );
+	bird.mesh.addEventListener( 'collision', destroyDestructibleObject);
+	camera.setParent( bird.mesh );
+
+	bird.mesh.setLinearVelocity(
 		new THREE.Vector3(
 			0,
-			speed * (e.clientY - mouseDownPos.y),
-			speed * (e.clientX - mouseDownPos.x)
+			speed * (e.clientY - mouseDownPos.y)/(document.body.clientWidth),
+			speed * (e.clientX - mouseDownPos.x)/(window.innerHeight)
 		)
-	);*/
+	);
+
+	setTimeout(
+		function(){
+			deleteBird();
+		},
+		20000
+	);
 
 	slingshot.resetIndicator();
 
@@ -177,14 +244,24 @@ var handleMouseUp = function( e ){
 
 function initCamera(){
 
-	camera = new BIRD.BirdCamera( 2000, new THREE.PerspectiveCamera( 45, aspectRatio, 0.1, 10000 ), bird.mesh );
+	camera = new BIRD.BirdCamera( 2000, new THREE.PerspectiveCamera( 45, 1, 0.1, 10000 ), slingshot.handleMesh );
 	camera.camera.lookAt( scene.position );
 
 }
 
-function render(){
+function initAudio(){
 
-	//bird.mesh.setLinearVelocity( new THREE.Vector3( 0, bird.mesh.getLinearVelocity().y, bird.mesh.getLinearVelocity().z ) );
+	ambientNoise = new Audio('Sounds/ambient_forest.wav');
+	ambientNoise.loop = true;
+	ambientNoise.play();
+
+	music = new Audio('Sounds/guitar_loop.mp3');
+	music.loop = true;
+	music.play();
+
+}
+
+function render(){
 
 	scene.simulate();
 

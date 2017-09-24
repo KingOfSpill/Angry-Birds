@@ -65,6 +65,12 @@ SLINGSHOT.createSlingshot = function ( scene, position ){
 	this.indicatorMeshRight.position.y = 100 + 200/Math.sqrt(2);
 	this.indicatorMeshRight.position.z = 100/Math.sqrt(2);
 
+	// Found at https://freesound.org/people/potsunen/sounds/343454/
+	this.snap = new Audio('Sounds/snap.wav');
+	// Found at https://freesound.org/people/Anthousai/sounds/399008/
+	this.stretch = new Audio('Sounds/stretch.wav');
+	this.stretch.loop = true;
+
 	this.updateIndicator = function(scaleX,scaleY){
 
 		if( scaleX > 1 )
@@ -119,7 +125,8 @@ SLINGSHOT.createSlingshot = function ( scene, position ){
 
 	this.resetIndicator = function(){
 
-		
+		this.stretch.pause();
+		this.snap.play();
 		this.updateIndicator(0,0);
 
 	}

@@ -1,12 +1,23 @@
 var BIRD = { REVISION: '2' };
 
-BIRD.createBird = function ( color, scene, x, y, z ){
+BIRD.createBird = function ( color, scene, position){
 
 	const birdMaterial = Physijs.createMaterial(
 	    new THREE.MeshLambertMaterial({ color: color, map: THREE.ImageUtils.loadTexture('Textures/test.jpg') }),
-	    0.8,
-	    0.8
+	    1,
+	    0
 	);
+
+	this.numDestroyed = 0;
+	this.destroyedObject = function(){
+
+		this.numDestroyed += 1;
+		if(this.numDestroyed >= 2)
+			return true;
+
+		return false;
+
+	}
 
 	this.mesh = new Physijs.SphereMesh(
 		new THREE.SphereGeometry( 15 ),
@@ -14,9 +25,7 @@ BIRD.createBird = function ( color, scene, x, y, z ){
 		200
 	);
 	this.mesh.name = "bird";
-	this.mesh.position.x = x;
-	this.mesh.position.y = y;
-	this.mesh.position.z = z;
+	this.mesh.position = position;
 	this.mesh.castShadow = true;
 	scene.add( this.mesh );
 
