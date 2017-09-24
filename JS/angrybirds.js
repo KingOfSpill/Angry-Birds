@@ -9,11 +9,10 @@ var renderer;
 var scene;
 var camera;
 var aspectRatio = 1.75;
+var slingshot
 var sun;
 var baseLight
 var bird;
-var Vspeed = 1;
-var Hspeed = 1;
 
 var mouseDownPos;
 var speed = 10;
@@ -94,6 +93,8 @@ function initScene(){
 	var falling = new TARGET.createFallingTarget(0xFFFF00, 0, 35, new THREE.Vector3(0,280,5500), scene );
 	var falling2 = new TARGET.createFallingTarget(0xFFFF00, 0, 35, new THREE.Vector3(0,490,5300), scene );
 
+	slingshot = new SLINGSHOT.createSlingshot(scene, new THREE.Vector3(0,100,6100));
+
 }
 
 function remove(name){
@@ -146,26 +147,28 @@ function handleMouseDown(event){
 
 	mouseDownPos = new THREE.Vector2( event.clientX, event.clientY );
 
-	window.addEventListener("mousemove", function(e){ handleMouseMovement(e); });
-	window.addEventListener("mouseup", function(e){ handleMouseUp(e); });
+	window.addEventListener("mousemove", handleMouseMovement);
+	window.addEventListener("mouseup", handleMouseUp);
 
 }
 
-function handleMouseMovement( event ){
+var handleMouseMovement = function( e ){
 
-	//Make a bird.mesh draw from the bird.mesh out the same direction as the mouse pos
+	slingshot.updateIndicator((mouseDownPos.x - e.clientX)/(document.body.clientWidth), (mouseDownPos.y - e.clientY)/(window.innerHeight));
 
 }
 
-function handleMouseUp( event ){
+var handleMouseUp = function( e ){
 
-	bird.mesh.setLinearVelocity(
+	/*bird.mesh.setLinearVelocity(
 		new THREE.Vector3(
 			0,
-			speed * (event.clientY - mouseDownPos.y),
-			speed * (event.clientX - mouseDownPos.x)
+			speed * (e.clientY - mouseDownPos.y),
+			speed * (e.clientX - mouseDownPos.x)
 		)
-	);
+	);*/
+
+	slingshot.resetIndicator();
 
 	window.removeEventListener("mousemove", handleMouseMovement);
 	window.removeEventListener("mouseup", handleMouseUp);
