@@ -1,7 +1,7 @@
 var TARGET = { REVISION: '1' };
 var numTargets = 0;
 
-TARGET.createDestructibleTarget = function( destructionVelocity, color, score, size, position, scene ){
+TARGET.createDestructibleTarget = function( color, size, position, scene ){
 
 	numTargets += 1;
 
@@ -10,9 +10,6 @@ TARGET.createDestructibleTarget = function( destructionVelocity, color, score, s
 	    0.8,
 	    0.0
 	);
-
-	this.destructionVelocity = destructionVelocity;
-	this.score = score;
 
 	this.mesh = new Physijs.BoxMesh(
 		new THREE.BoxGeometry( size.x, size.y, size.z ),
@@ -26,7 +23,7 @@ TARGET.createDestructibleTarget = function( destructionVelocity, color, score, s
 
 }
 
-TARGET.createFallingTarget = function( color, score, size, position, scene ){
+TARGET.createFallingTarget = function( color, size, position, scene ){
 
 	numTargets += 1;
 
@@ -35,8 +32,6 @@ TARGET.createFallingTarget = function( color, score, size, position, scene ){
 	    0.8,
 	    0.0
 	);
-
-	this.score = score;
 
 	this.mesh = new Physijs.SphereMesh(
 		new THREE.SphereGeometry( size ),

@@ -55,8 +55,13 @@ function initScene(){
 	scene = new Physijs.Scene();
 	scene.setGravity( new THREE.Vector3(0,-100,0) );
 
+	var groundTop = [new THREE.Vector2(0,1), new THREE.Vector2(1,1), new THREE.Vector2(1,0.5), new THREE.Vector2(0,0.5)];
+	var groundSide = [new THREE.Vector2(1,0.5), new THREE.Vector2(1,0), new THREE.Vector2(0,0), new THREE.Vector2(0,0.5)];
+
+	var texture = THREE.ImageUtils.loadTexture('Textures/Grass.png');
+
 	var groundMaterial = Physijs.createMaterial(
-	    new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture('Textures/Grass.png') }),
+	    new THREE.MeshLambertMaterial({ map: texture }),
 	    1,
 	    0.0
 	);
@@ -70,7 +75,14 @@ function initScene(){
 
 	}
 
-	var floor = new Physijs.BoxMesh( new THREE.BoxGeometry(2000,4000,15000), groundMaterial, 0 );
+	var floorGeometry = new THREE.BoxGeometry(2000,4000,15000);
+	floorGeometry.faceVertexUvs[0][4] = [groundTop[0], groundTop[1], groundTop[3]];
+	floorGeometry.faceVertexUvs[0][5] = [groundTop[1], groundTop[2], groundTop[3]];
+
+	floorGeometry.faceVertexUvs[0][0] = [groundSide[0], groundSide[1], groundSide[3]];
+	floorGeometry.faceVertexUvs[0][1] = [groundSide[1], groundSide[2], groundSide[3]];
+
+	var floor = new Physijs.BoxMesh( floorGeometry, groundMaterial, 0 );
 	floor.position.x = -600;
 	floor.position.y = -2000;
 	floor.receiveShadow = true;
@@ -78,7 +90,14 @@ function initScene(){
 	floor.addEventListener( 'collision', destroyFallingObject);
 	scene.add(floor);
 
-	var leftSide = new Physijs.BoxMesh( new THREE.BoxGeometry(2000,4000,4000), groundMaterial, 0 );
+	var sideGeometry = new THREE.BoxGeometry(2000,4000,4000);
+	sideGeometry.faceVertexUvs[0][4] = [groundTop[0], groundTop[1], groundTop[3]];
+	sideGeometry.faceVertexUvs[0][5] = [groundTop[1], groundTop[2], groundTop[3]];
+
+	sideGeometry.faceVertexUvs[0][0] = [groundSide[0], groundSide[1], groundSide[3]];
+	sideGeometry.faceVertexUvs[0][1] = [groundSide[1], groundSide[2], groundSide[3]];
+
+	var leftSide = new Physijs.BoxMesh( sideGeometry, groundMaterial, 0 );
 	leftSide.position.z = 10000;
 	leftSide.position.x = -600;
 	leftSide.rotation.x = -Math.PI / 4;
@@ -87,7 +106,7 @@ function initScene(){
 	leftSide.addEventListener( 'collision', destroyFallingObject);
 	scene.add(leftSide);
 
-	var rightSide = new Physijs.BoxMesh( new THREE.BoxGeometry(2000,4000,4000), groundMaterial, 0 );
+	var rightSide = new Physijs.BoxMesh( sideGeometry, groundMaterial, 0 );
 	rightSide.position.z = -10000;
 	rightSide.position.x = -600;
 	rightSide.rotation.x = Math.PI / 4;
@@ -96,14 +115,14 @@ function initScene(){
 	rightSide.addEventListener( 'collision', destroyFallingObject);
 	scene.add(rightSide);
 
-	var target =  new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(100,200,20), new THREE.Vector3(0,100,5600), scene );
-	var target2 = new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(100,200,20), new THREE.Vector3(0,100,5400), scene );
-	var target3 = new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(100,20,220), new THREE.Vector3(0,210,5500), scene );
-	var target4 = new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(100,200,20), new THREE.Vector3(0,320,5400), scene );
-	var target5 = new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(100,420,20), new THREE.Vector3(0,210,5200), scene );
-	var target6 = new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(100,20,220), new THREE.Vector3(0,420,5300), scene );
-	var falling = new TARGET.createFallingTarget(0xFFFF00, 0, 35, new THREE.Vector3(0,280,5500), scene );
-	var falling2 = new TARGET.createFallingTarget(0xFFFF00, 0, 35, new THREE.Vector3(0,490,5300), scene );
+	var target =  new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,200,20), new THREE.Vector3(0,100,5600), scene );
+	var target2 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,200,20), new THREE.Vector3(0,100,5400), scene );
+	var target3 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,20,220), new THREE.Vector3(0,210,5500), scene );
+	var target4 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,200,20), new THREE.Vector3(0,320,5400), scene );
+	var target5 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,420,20), new THREE.Vector3(0,210,5200), scene );
+	var target6 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,20,220), new THREE.Vector3(0,420,5300), scene );
+	var falling = new TARGET.createFallingTarget(0x44FF00, 35, new THREE.Vector3(0,280,5500), scene );
+	var falling2 = new TARGET.createFallingTarget(0x44FF00, 35, new THREE.Vector3(0,490,5300), scene );
 
 	slingshot = new SLINGSHOT.createSlingshot(scene, new THREE.Vector3(0,100,6100));
 
@@ -121,6 +140,17 @@ function initHud(){
 	scoreText.style.left = 5 + '%';
 	updateScore(0);
 	document.body.appendChild(scoreText);
+
+	var instructions = document.createElement('div');
+	instructions.style.position = 'absolute';
+	instructions.style.width = 20 + '%';
+	instructions.style.height = 20 + '%';
+	instructions.style.color = "white";
+	instructions.style.fontSize = 2 + 'vw';
+	instructions.style.top = 5 + '%';
+	instructions.style.right = 5 + '%';
+	instructions.innerHTML = "Controls:<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click & Drag With<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mouse To Wind Up<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;& Release To Fire";
+	document.body.appendChild(instructions);
 
 }
 
@@ -216,24 +246,26 @@ var handleMouseMovement = function( e ){
 
 var handleMouseUp = function( e ){
 
-	bird = new BIRD.createBird( 0xFF0000, scene, new THREE.Vector3(0,400,6100) );
-	bird.mesh.addEventListener( 'collision', destroyDestructibleObject);
-	camera.setParent( bird.mesh );
+	if( (e.clientX - mouseDownPos.x)/(window.innerHeight) < 0 ){
+		bird = new BIRD.createBird( 0xFF0000, scene, new THREE.Vector3(0,400,6100) );
+		bird.mesh.addEventListener( 'collision', destroyDestructibleObject);
+		camera.setParent( bird.mesh );
 
-	bird.mesh.setLinearVelocity(
-		new THREE.Vector3(
-			0,
-			speed * (e.clientY - mouseDownPos.y)/(document.body.clientWidth),
-			speed * (e.clientX - mouseDownPos.x)/(window.innerHeight)
-		)
-	);
+		bird.mesh.setLinearVelocity(
+			new THREE.Vector3(
+				0,
+				speed * (e.clientY - mouseDownPos.y)/(document.body.clientWidth),
+				speed * (e.clientX - mouseDownPos.x)/(window.innerHeight)
+			)
+		);
 
-	setTimeout(
-		function(){
-			deleteBird();
-		},
-		20000
-	);
+		setTimeout(
+			function(){
+				deleteBird();
+			},
+			20000
+		);
+	}
 
 	slingshot.resetIndicator();
 
