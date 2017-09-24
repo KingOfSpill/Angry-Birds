@@ -15,6 +15,8 @@ var bird;
 
 var ambientNoise;
 var music;
+var breakNoise;
+var poof;
 
 var mute = false;
 
@@ -97,12 +99,14 @@ function initScene(){
 	var groundMaterial = Physijs.createMaterial(
 	    new THREE.MeshLambertMaterial({ map: texture }),
 	    1,
-	    0.0
+	    0.1
 	);
 
 	var destroyFallingObject = function(other_object, relative_velocity, relative_rotation, contact_normal){
 
 		if( other_object.name == "Falling" ){
+			if(!mute)
+				poof.play();
 			newScorePopup(100,other_object.position);
 			updateScore(100);
 			remove(other_object);
@@ -110,7 +114,7 @@ function initScene(){
 
 	}
 
-	var floorGeometry = new THREE.BoxGeometry(2000,4000,15000);
+	var floorGeometry = new THREE.BoxGeometry(2000,4000,18000);
 	floorGeometry.faceVertexUvs[0][4] = [groundTop[0], groundTop[1], groundTop[3]];
 	floorGeometry.faceVertexUvs[0][5] = [groundTop[1], groundTop[2], groundTop[3]];
 
@@ -125,7 +129,7 @@ function initScene(){
 	floor.addEventListener( 'collision', destroyFallingObject);
 	scene.add(floor);
 
-	var sideGeometry = new THREE.BoxGeometry(2000,4000,4000);
+	var sideGeometry = new THREE.BoxGeometry(2100,4000,4000);
 	sideGeometry.faceVertexUvs[0][4] = [groundTop[0], groundTop[1], groundTop[3]];
 	sideGeometry.faceVertexUvs[0][5] = [groundTop[1], groundTop[2], groundTop[3]];
 
@@ -150,7 +154,7 @@ function initScene(){
 	rightSide.addEventListener( 'collision', destroyFallingObject);
 	scene.add(rightSide);
 
-	generateTargets( -5400, 5400 );
+	generateTargets( -5000, 5400 );
 
 	slingshot = new SLINGSHOT.createSlingshot(scene, new THREE.Vector3(0,100,6100));
 
@@ -164,14 +168,14 @@ function generateTargets(minZ,maxZ){
 
 		switch( Math.floor(Math.random()*2) ){
 			case 0:
-				var size = Math.floor(Math.random()*(maxZ-curZ)/800);
+				var size = Math.floor(Math.random()*8);
 				generateStepStair( size, curZ-(size*150), 0 );
-				curZ += (size+1)*250;
+				curZ += (size+1)*300;
 				break;
 			case 1:
-				var size = Math.floor(Math.random()*(maxZ-curZ)/800);
+				var size = Math.floor(Math.random()*8);
 				generateStairStep( size, curZ, 0 );
-				curZ += (size+1)*250;
+				curZ += (size+1)*300;
 				break;
 		}
 	}
@@ -185,7 +189,7 @@ function generateStairStep(numSteps, z, lastY){
 	var rightLeg = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,(lastY+200),20), new THREE.Vector3(0,(lastY+200)/2,z-100), scene );
 	var top = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,20,220), new THREE.Vector3(0,lastY+200,z), scene );
 
-	if( Math.random() < 0.3 )
+	if( Math.random() < 0.5 )
 		var falling = new TARGET.createFallingTarget(0x44FF00, 35, new THREE.Vector3(0,lastY+245,z), scene );
 
 	if( numSteps > 1 )
@@ -199,7 +203,7 @@ function generateStepStair(numSteps, z, lastY){
 	var rightLeg = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,(lastY+200),20), new THREE.Vector3(0,(lastY+200)/2,z+100), scene );
 	var top = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,20,220), new THREE.Vector3(0,lastY+200,z), scene );
 
-	if( Math.random() < 0.3 )
+	if( Math.random() < 0.5 )
 		var falling = new TARGET.createFallingTarget(0x44FF00, 35, new THREE.Vector3(0,lastY+245,z), scene );
 
 	if( numSteps > 1 )
@@ -258,6 +262,11 @@ function updateScore(amount){
 var destroyDestructibleObject = function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 
 	if( other_object.name == "Destructible" ){
+
+		if(!mute){
+			breakNoise.play();
+		}
+
 		newScorePopup(50,bird.mesh.position);
 		if( bird.destroyedObject() ){
 			deleteBird();
@@ -271,7 +280,6 @@ var destroyDestructibleObject = function( other_object, relative_velocity, relat
 function deleteBird(){
 
 	scene.remove(bird.mesh);
-	bird.mesh.removeEventListener('collision', destroyDestructibleObject);
 	bird = null;
 	camera.setParent( slingshot.handleMesh );
 
@@ -332,9 +340,6 @@ function handleMouseDown(event){
 
 		window.addEventListener("mousemove", handleMouseMovement);
 		window.addEventListener("mouseup", handleMouseUp);
-	}else{
-		console.log( bird.mesh.position.y );
-		console.log( camera.camera.position.y );
 	}
 
 }
@@ -385,6 +390,12 @@ function initAudio(){
 	music = new Audio('Sounds/guitar_loop.mp3');
 	music.loop = true;
 	music.play();
+
+	// Found at https://freesound.org/people/kevinkace/sounds/66777/
+	breakNoise = new Audio('Sounds/wood_break.wav');
+
+	// Found at https://freesound.org/people/Planman/sounds/208111/
+	poof = new Audio('Sounds/poof.wav');
 
 	window.addEventListener('keydown', function(event) {
 		if(event.keyCode == 77){

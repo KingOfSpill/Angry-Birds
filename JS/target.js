@@ -7,8 +7,8 @@ TARGET.createDestructibleTarget = function( color, size, position, scene ){
 
 	const targetMaterial = Physijs.createMaterial(
 	    new THREE.MeshLambertMaterial({ color: color, map: THREE.ImageUtils.loadTexture('Textures/birb.png') }),
-	    0.8,
-	    0.0
+	    1,
+	    0.1
 	);
 
 	this.mesh = new Physijs.BoxMesh(
@@ -29,8 +29,8 @@ TARGET.createFallingTarget = function( color, size, position, scene ){
 
 	const targetMaterial = Physijs.createMaterial(
 	    new THREE.MeshLambertMaterial({ color: color, map: THREE.ImageUtils.loadTexture('Textures/birb.png') }),
-	    0.8,
-	    0.0
+	    1,
+	    0.1
 	);
 
 	this.mesh = new Physijs.SphereMesh(
