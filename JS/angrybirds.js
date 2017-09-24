@@ -31,7 +31,7 @@ function init(){
 
 function initScene(){
 
-	scene = new Physijs.Scene;
+	scene = new Physijs.Scene();
 	scene.setGravity( new THREE.Vector3(0,-100,0) );
 
 	var groundMaterial = Physijs.createMaterial(
@@ -44,6 +44,7 @@ function initScene(){
 	floor.position.x = -600;
 	floor.position.y = -2000;
 	floor.receiveShadow = true;
+	floor.name = "ground";
 	scene.add(floor);
 
 	var leftSide = new Physijs.BoxMesh( new THREE.BoxGeometry(2000,4000,4000), groundMaterial, 0 );
@@ -51,6 +52,7 @@ function initScene(){
 	leftSide.position.x = -600;
 	leftSide.rotation.x = -Math.PI / 4;
 	leftSide.receiveShadow = true;
+	leftSide.name = "ground";
 	scene.add(leftSide);
 
 	var rightSide = new Physijs.BoxMesh( new THREE.BoxGeometry(2000,4000,4000), groundMaterial, 0 );
@@ -58,9 +60,25 @@ function initScene(){
 	rightSide.position.x = -600;
 	rightSide.rotation.x = Math.PI / 4;
 	rightSide.receiveShadow = true;
+	rightSide.name = "ground";
 	scene.add(rightSide);
 
 	bird = new BIRD.createBird( 0xFF0000, scene, 0, 20, 6000 );
+	bird.mesh.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+    	
+		if( other_object.name != "ground" ){
+			remove(other_object);
+		}
+
+	});
+
+	var target = new TARGET.createDestructibleTarget(0, 0x0000FF, 0, new THREE.Vector3(50,100,20), new THREE.Vector3(0,20,5600), scene );
+
+}
+
+function remove(name){
+
+	scene.remove( name );
 
 }
 
@@ -143,7 +161,7 @@ function initCamera(){
 
 function render(){
 
-	//bird.mesh.setAngularVelocity( new THREE.Vector3( 0, 0, 0 ) );
+	//bird.mesh.setLinearVelocity( new THREE.Vector3( 0, bird.mesh.getLinearVelocity().y, bird.mesh.getLinearVelocity().z ) );
 
 	scene.simulate();
 
