@@ -13,6 +13,7 @@ BIRD.createBird = function ( color, scene, x, y, z ){
 		birdMaterial,
 		200
 	);
+	this.mesh.name = "bird";
 	this.mesh.position.x = x;
 	this.mesh.position.y = y;
 	this.mesh.position.z = z;
@@ -23,6 +24,7 @@ BIRD.createBird = function ( color, scene, x, y, z ){
 
 BIRD.BirdCamera = function ( inRadius, inCamera, parent ){
 
+	this.minRadius = inRadius;
 	this.radius = inRadius;
 	this.horizontalAngle = 0;
 	this.maxHorizontalAngle = Math.PI / 2;
@@ -55,7 +57,13 @@ BIRD.BirdCamera = function ( inRadius, inCamera, parent ){
 		this.camera.position.z += this.parent.position.z + (this.radius * Math.sin(this.horizontalAngle));
 		this.camera.position.z /= 4;
 
-		this.camera.lookAt( new THREE.Vector3(this.parent.position.x, 0, this.parent.position.z) );
+		if( this.parent.position.y > this.minRadius/3 ){
+			this.radius = parent.position.y * 3;
+		}else{
+			this.radius = this.minRadius;
+		}
+
+		this.camera.lookAt( new THREE.Vector3(this.parent.position.x, 0 , this.parent.position.z) );
 
 	}
 
