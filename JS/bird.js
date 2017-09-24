@@ -63,7 +63,10 @@ BIRD.BirdCamera = function ( inRadius, inCamera, parent ){
 		this.camera.position.x /= 4;
 
 		this.camera.position.z *= 3;
-		this.camera.position.z += this.parent.position.z + (this.radius * Math.sin(this.horizontalAngle));
+		if( this.parent.name != "slingshot" )
+			this.camera.position.z += this.parent.position.z + (this.radius * Math.sin(this.horizontalAngle));
+		else
+			this.camera.position.z += this.parent.position.z - this.radius*0.75;
 		this.camera.position.z /= 4;
 
 		if( this.parent.position.y > this.minRadius/3 ){
@@ -72,7 +75,10 @@ BIRD.BirdCamera = function ( inRadius, inCamera, parent ){
 			this.radius = this.minRadius;
 		}
 
-		this.camera.lookAt( new THREE.Vector3(this.parent.position.x, 0 , this.parent.position.z) );
+		if( this.parent.name != "slingshot" )
+			this.camera.lookAt( new THREE.Vector3(this.parent.position.x, 0 , this.parent.position.z) );
+		else
+			this.camera.lookAt( new THREE.Vector3(this.parent.position.x, 0 , this.parent.position.z-this.radius*0.75) );
 
 	}
 

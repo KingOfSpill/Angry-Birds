@@ -14,6 +14,7 @@ SLINGSHOT.createSlingshot = function ( scene, position ){
 		0
 	);
 	this.handleMesh.position = position;
+	this.handleMesh.name = "slingshot";
 
 
 	this.yLeftMesh = new Physijs.CylinderMesh(

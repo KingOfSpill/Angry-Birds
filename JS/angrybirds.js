@@ -115,16 +115,32 @@ function initScene(){
 	rightSide.addEventListener( 'collision', destroyFallingObject);
 	scene.add(rightSide);
 
-	var target =  new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,200,20), new THREE.Vector3(0,100,5600), scene );
+	generateStairStep( Math.floor(Math.random()*10), 5400, 0 );
+
+	/*var target =  
 	var target2 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,200,20), new THREE.Vector3(0,100,5400), scene );
 	var target3 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,20,220), new THREE.Vector3(0,210,5500), scene );
 	var target4 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,200,20), new THREE.Vector3(0,320,5400), scene );
 	var target5 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,420,20), new THREE.Vector3(0,210,5200), scene );
 	var target6 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,20,220), new THREE.Vector3(0,420,5300), scene );
 	var falling = new TARGET.createFallingTarget(0x44FF00, 35, new THREE.Vector3(0,280,5500), scene );
-	var falling2 = new TARGET.createFallingTarget(0x44FF00, 35, new THREE.Vector3(0,490,5300), scene );
+	var falling2 = new TARGET.createFallingTarget(0x44FF00, 35, new THREE.Vector3(0,490,5300), scene );*/
 
 	slingshot = new SLINGSHOT.createSlingshot(scene, new THREE.Vector3(0,100,6100));
+
+}
+
+function generateStairStep(numSteps, z, lastY){
+
+	var leftLeg = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,200,20), new THREE.Vector3(0,lastY+100,z+100), scene );
+	var rightLeg = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,(lastY+200),20), new THREE.Vector3(0,(lastY+200)/2,z-100), scene );
+	var top = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,20,220), new THREE.Vector3(0,lastY+200,z), scene );
+
+	if( Math.random() < 0.3 )
+		var falling = new TARGET.createFallingTarget(0x44FF00, 35, new THREE.Vector3(0,lastY+245,z), scene );
+
+	if( numSteps > 1 )
+		generateStairStep( numSteps - 1, z - 200, lastY + 220 );
 
 }
 
@@ -276,7 +292,7 @@ var handleMouseUp = function( e ){
 
 function initCamera(){
 
-	camera = new BIRD.BirdCamera( 2000, new THREE.PerspectiveCamera( 45, 1, 0.1, 10000 ), slingshot.handleMesh );
+	camera = new BIRD.BirdCamera( 3500, new THREE.PerspectiveCamera( 45, 1, 0.1, 10000 ), slingshot.handleMesh );
 	camera.camera.lookAt( scene.position );
 
 }
