@@ -56,9 +56,8 @@ BIRD.BirdCamera = function ( inRadius, inCamera, parent ){
 	this.rotSpeed = 0.02;
 
 	this.camera = inCamera;
+	this.camera.far = 30000;
 	this.parent = parent;
-
-	//parent.add( this.camera );
 
 	this.camera.position.x = this.parent.position.x + this.radius/Math.sqrt(2);
 	this.camera.position.y = this.parent.position.y + this.radius/Math.sqrt(2);
@@ -83,8 +82,8 @@ BIRD.BirdCamera = function ( inRadius, inCamera, parent ){
 			this.camera.position.z += this.parent.position.z - document.body.clientWidth*1.75;
 		this.camera.position.z /= 4;
 
-		if( this.parent.position.y > this.minRadius/3 ){
-			this.radius = parent.position.y * 3;
+		if( (this.parent.position.y) * 2 * Math.sqrt(2) > this.minRadius ){
+			this.radius = (this.parent.position.y) * 2 * Math.sqrt(2);
 		}else{
 			this.radius = this.minRadius;
 		}

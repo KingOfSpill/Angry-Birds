@@ -140,35 +140,3 @@ SLINGSHOT.createSlingshot = function ( scene, position ){
 	scene.add(this.handleMesh);
 
 }
-
-//window.addEventListener("mousedown", function(e){ handleMouseDown(e); } );
-
-SLINGSHOT.handleMouseDown = function(event){
-
-	mouseDownPos = new THREE.Vector2( event.clientX, event.clientY );
-
-	window.addEventListener("mousemove", function(e){ handleMouseMovement(e); });
-	window.addEventListener("mouseup", function(e){ handleMouseUp(e); });
-
-}
-
-SLINGSHOT.handleMouseMovement = function( event ){
-
-	
-
-}
-
-SLINGSHOT.handleMouseUp = function( event ){
-
-	bird.mesh.setLinearVelocity(
-		new THREE.Vector3(
-			0,
-			speed * (event.clientY - mouseDownPos.y),
-			speed * (event.clientX - mouseDownPos.x)
-		)
-	);
-
-	window.removeEventListener("mousemove", handleMouseMovement);
-	window.removeEventListener("mouseup", handleMouseUp);
-
-}

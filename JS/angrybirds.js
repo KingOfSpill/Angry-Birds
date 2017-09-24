@@ -332,6 +332,9 @@ function handleMouseDown(event){
 
 		window.addEventListener("mousemove", handleMouseMovement);
 		window.addEventListener("mouseup", handleMouseUp);
+	}else{
+		console.log( bird.mesh.position.y );
+		console.log( camera.camera.position.y );
 	}
 
 }
@@ -352,10 +355,11 @@ var handleMouseUp = function( e ){
 		bird.mesh.setLinearVelocity(
 			new THREE.Vector3(
 				0,
-				speed * (e.clientY - mouseDownPos.y)/(document.body.clientWidth),
-				speed * (e.clientX - mouseDownPos.x)/(window.innerHeight)
+				speed * (e.clientY - mouseDownPos.y)/(document.body.clientHeight),
+				speed * (e.clientX - mouseDownPos.x)/(document.body.clientWidth)
 			)
 		);
+
 	}
 
 	slingshot.resetIndicator(mute);
