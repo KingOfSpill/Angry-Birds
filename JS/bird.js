@@ -19,6 +19,20 @@ BIRD.createBird = function ( color, scene, position){
 
 	}
 
+	this.ticksExisting = 0;
+	this.timeToDelete = function(){
+
+		this.ticksExisting += 1;
+
+		if(this.mesh.position.y < -10)
+			return true;
+
+		if(this.ticksExisting > 20*60)
+			return true;
+
+		return false;
+	}
+
 	this.mesh = new Physijs.SphereMesh(
 		new THREE.SphereGeometry( 15 ),
 		birdMaterial,
@@ -66,7 +80,7 @@ BIRD.BirdCamera = function ( inRadius, inCamera, parent ){
 		if( this.parent.name != "slingshot" )
 			this.camera.position.z += this.parent.position.z + (this.radius * Math.sin(this.horizontalAngle));
 		else
-			this.camera.position.z += this.parent.position.z - this.radius*0.75;
+			this.camera.position.z += this.parent.position.z - document.body.clientWidth*1.75;
 		this.camera.position.z /= 4;
 
 		if( this.parent.position.y > this.minRadius/3 ){
@@ -78,7 +92,7 @@ BIRD.BirdCamera = function ( inRadius, inCamera, parent ){
 		if( this.parent.name != "slingshot" )
 			this.camera.lookAt( new THREE.Vector3(this.parent.position.x, 0 , this.parent.position.z) );
 		else
-			this.camera.lookAt( new THREE.Vector3(this.parent.position.x, 0 , this.parent.position.z-this.radius*0.75) );
+			this.camera.lookAt( new THREE.Vector3(this.parent.position.x, 0 , this.parent.position.z-document.body.clientWidth*1.75) );
 
 	}
 

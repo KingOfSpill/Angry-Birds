@@ -124,10 +124,12 @@ SLINGSHOT.createSlingshot = function ( scene, position ){
 		this.indicatorMeshRight.position.y = (100 + 200/Math.sqrt(2)) + Math.cos(verticalAngle)*100/Math.sqrt(2);
 	}
 
-	this.resetIndicator = function(){
+	this.resetIndicator = function(mute){
 
-		this.stretch.pause();
-		this.snap.play();
+		if(!mute){
+			this.stretch.pause();
+			this.snap.play();
+		}
 		this.updateIndicator(0,0);
 
 	}

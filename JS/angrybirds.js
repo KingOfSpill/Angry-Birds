@@ -16,6 +16,8 @@ var bird;
 var ambientNoise;
 var music;
 
+var mute = false;
+
 var mouseDownPos;
 var speed = 1000;
 
@@ -148,19 +150,7 @@ function initScene(){
 	rightSide.addEventListener( 'collision', destroyFallingObject);
 	scene.add(rightSide);
 
-	//generateStairStep( 5, 5400, 0 );
-	//generateStepStair( 5, 3000, 0 );
-
 	generateTargets( -5400, 5400 );
-
-	/*var target =  
-	var target2 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,200,20), new THREE.Vector3(0,100,5400), scene );
-	var target3 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,20,220), new THREE.Vector3(0,210,5500), scene );
-	var target4 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,200,20), new THREE.Vector3(0,320,5400), scene );
-	var target5 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,420,20), new THREE.Vector3(0,210,5200), scene );
-	var target6 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,20,220), new THREE.Vector3(0,420,5300), scene );
-	var falling = new TARGET.createFallingTarget(0x44FF00, 35, new THREE.Vector3(0,280,5500), scene );
-	var falling2 = new TARGET.createFallingTarget(0x44FF00, 35, new THREE.Vector3(0,490,5300), scene );*/
 
 	slingshot = new SLINGSHOT.createSlingshot(scene, new THREE.Vector3(0,100,6100));
 
@@ -238,7 +228,11 @@ function initHud(){
 	instructions.style.fontSize = 2 + 'vw';
 	instructions.style.top = 5 + '%';
 	instructions.style.right = 5 + '%';
-	instructions.innerHTML = "Controls:<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Aim: Click & Drag<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fire: Release<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mute: M";
+	instructions.innerHTML = "Controls:<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
+							 "Aim: Click & Drag<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
+							 "Fire: Release<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
+							 "Mute: M<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+							 "Press F5 To Generate<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New Level";
 	document.body.appendChild(instructions);
 
 	var name = document.createElement('div');
@@ -330,12 +324,15 @@ window.addEventListener("resize", resize);
 
 function handleMouseDown(event){
 
-	mouseDownPos = new THREE.Vector2( event.clientX, event.clientY );
-	slingshot.stretch.play();
+	if( camera.parent.name == "slingshot" ){
+		mouseDownPos = new THREE.Vector2( event.clientX, event.clientY );
+		if(!mute)
+			slingshot.stretch.play();
 
 
-	window.addEventListener("mousemove", handleMouseMovement);
-	window.addEventListener("mouseup", handleMouseUp);
+		window.addEventListener("mousemove", handleMouseMovement);
+		window.addEventListener("mouseup", handleMouseUp);
+	}
 
 }
 
@@ -361,7 +358,7 @@ var handleMouseUp = function( e ){
 		);
 	}
 
-	slingshot.resetIndicator();
+	slingshot.resetIndicator(mute);
 
 	window.removeEventListener("mousemove", handleMouseMovement);
 	window.removeEventListener("mouseup", handleMouseUp);
@@ -385,9 +382,26 @@ function initAudio(){
 	music.loop = true;
 	music.play();
 
+	window.addEventListener('keydown', function(event) {
+		if(event.keyCode == 77){
+			mute = !mute;
+			if(mute){
+				ambientNoise.pause();
+				music.pause();
+			}else{
+				ambientNoise.play();
+				music.play();
+			}
+		}
+	}, false);
+
 }
 
 function render(){
+
+	if( bird != null )
+		if( bird.timeToDelete() )
+			deleteBird();
 
 	for(var i = 0; i < scorePopups.length; i++){
 
