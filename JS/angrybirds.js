@@ -165,7 +165,7 @@ function generateTargets(minZ,maxZ){
 		switch( Math.floor(Math.random()*2) ){
 			case 0:
 				var size = Math.floor(Math.random()*(maxZ-curZ)/800);
-				generateStepStair( size, curZ, 0 );
+				generateStepStair( size, curZ-(size*150), 0 );
 				curZ += (size+1)*250;
 				break;
 			case 1:
