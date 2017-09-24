@@ -13,9 +13,6 @@ var sun;
 var baseLight
 var bird;
 
-var hudRenderer;
-var hudCamera;
-
 var ambientNoise;
 var music;
 
@@ -24,6 +21,8 @@ var speed = 1000;
 
 var score = 0;
 var scoreText;
+
+var scorePopups = [];
 
 // This disables the slingshot until the scene has loaded
 var simulationStarted = function() {
@@ -50,6 +49,39 @@ function init(){
 
 }
 
+function newScorePopup( textContent, position ){
+
+	var textGeometry = new THREE.TextGeometry( textContent, {
+		size: 100,
+		height: 30,
+		curveSegments: 2
+	});
+
+	textGeometry.computeBoundingBox();
+	var offset = -0.5 * ( textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x );
+
+	var text = new THREE.Mesh( textGeometry, new THREE.MeshLambertMaterial({color: 0xFFFFFF}) );
+	text.position.x = offset + position.x;
+	text.position.y = position.y;
+	text.position.z = position.z;
+	text.rotation.y = Math.PI/2;
+	//text.rotation.x = camera.camera.rotation.x;
+	text.castShadow = true;
+	scene.add( text );
+
+	scorePopups.push(text);
+
+	setTimeout(
+		function(){
+			scene.remove(text);
+		},
+		3000
+	);
+
+	return text;
+
+}
+
 function initScene(){
 
 	scene = new Physijs.Scene();
@@ -69,6 +101,7 @@ function initScene(){
 	var destroyFallingObject = function(other_object, relative_velocity, relative_rotation, contact_normal){
 
 		if( other_object.name == "Falling" ){
+			newScorePopup(100,other_object.position);
 			updateScore(100);
 			remove(other_object);
 		}
@@ -115,7 +148,10 @@ function initScene(){
 	rightSide.addEventListener( 'collision', destroyFallingObject);
 	scene.add(rightSide);
 
-	generateStairStep( Math.floor(Math.random()*10), 5400, 0 );
+	//generateStairStep( 5, 5400, 0 );
+	//generateStepStair( 5, 3000, 0 );
+
+	generateTargets( -5400, 5400 );
 
 	/*var target =  
 	var target2 = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,200,20), new THREE.Vector3(0,100,5400), scene );
@@ -130,6 +166,29 @@ function initScene(){
 
 }
 
+function generateTargets(minZ,maxZ){
+
+	var curZ = minZ;
+
+	while( curZ < maxZ ){
+
+		switch( Math.floor(Math.random()*2) ){
+			case 0:
+				var size = Math.floor(Math.random()*(maxZ-curZ)/800);
+				generateStepStair( size, curZ, 0 );
+				curZ += (size+1)*250;
+				break;
+			case 1:
+				var size = Math.floor(Math.random()*(maxZ-curZ)/800);
+				generateStairStep( size, curZ, 0 );
+				curZ += (size+1)*250;
+				break;
+		}
+	}
+
+
+}
+
 function generateStairStep(numSteps, z, lastY){
 
 	var leftLeg = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,200,20), new THREE.Vector3(0,lastY+100,z+100), scene );
@@ -141,6 +200,20 @@ function generateStairStep(numSteps, z, lastY){
 
 	if( numSteps > 1 )
 		generateStairStep( numSteps - 1, z - 200, lastY + 220 );
+
+}
+
+function generateStepStair(numSteps, z, lastY){
+
+	var leftLeg = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,200,20), new THREE.Vector3(0,lastY+100,z-100), scene );
+	var rightLeg = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,(lastY+200),20), new THREE.Vector3(0,(lastY+200)/2,z+100), scene );
+	var top = new TARGET.createDestructibleTarget(0xB69B4C, new THREE.Vector3(100,20,220), new THREE.Vector3(0,lastY+200,z), scene );
+
+	if( Math.random() < 0.3 )
+		var falling = new TARGET.createFallingTarget(0x44FF00, 35, new THREE.Vector3(0,lastY+245,z), scene );
+
+	if( numSteps > 1 )
+		generateStepStair( numSteps - 1, z + 200, lastY + 220 );
 
 }
 
@@ -165,8 +238,19 @@ function initHud(){
 	instructions.style.fontSize = 2 + 'vw';
 	instructions.style.top = 5 + '%';
 	instructions.style.right = 5 + '%';
-	instructions.innerHTML = "Controls:<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click & Drag With<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mouse To Wind Up<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;& Release To Fire";
+	instructions.innerHTML = "Controls:<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Aim: Click & Drag<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fire: Release<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mute: M";
 	document.body.appendChild(instructions);
+
+	var name = document.createElement('div');
+	name.style.position = 'absolute';
+	name.style.width = 20 + '%';
+	//name.style.height = 20 + '%';
+	name.style.color = "white";
+	name.style.fontSize = 1 + 'vw';
+	name.style.bottom = 1 + '%';
+	name.style.left = 1 + '%';
+	name.innerHTML = "By: Grant Goodman";
+	document.body.appendChild(name);
 
 }
 
@@ -180,6 +264,7 @@ function updateScore(amount){
 var destroyDestructibleObject = function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 
 	if( other_object.name == "Destructible" ){
+		newScorePopup(50,bird.mesh.position);
 		if( bird.destroyedObject() ){
 			deleteBird();
 		}
@@ -274,13 +359,6 @@ var handleMouseUp = function( e ){
 				speed * (e.clientX - mouseDownPos.x)/(window.innerHeight)
 			)
 		);
-
-		setTimeout(
-			function(){
-				deleteBird();
-			},
-			20000
-		);
 	}
 
 	slingshot.resetIndicator();
@@ -310,6 +388,12 @@ function initAudio(){
 }
 
 function render(){
+
+	for(var i = 0; i < scorePopups.length; i++){
+
+		scorePopups[i].position.y += 3;
+
+	}
 
 	scene.simulate();
 
