@@ -138,7 +138,7 @@ function initHud(){
 	instructions.style.right = 5 + '%';
 	instructions.innerHTML = "Controls:<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
 							 "Aim: Click & Drag<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
-							 "(Anywhere on screen)<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+							 "Anywhere On Screen<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
 							 "Fire: Release<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
 							 "Mute: M<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
 							 "Press F5 To Generate<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New Level";
